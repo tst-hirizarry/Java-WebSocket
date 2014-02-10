@@ -101,7 +101,7 @@ public class WebSocketImpl implements WebSocket {
 	private String closemessage = null;
 	private Integer closecode = null;
 	private Boolean closedremotely = null;
-	
+
 	private String resourceDescriptor = null;
 
 	/**
@@ -618,8 +618,8 @@ public class WebSocketImpl implements WebSocket {
 		this.handshakerequest = draft.postProcessHandshakeRequestAsClient( handshakedata );
 
 		resourceDescriptor = handshakedata.getResourceDescriptor();
-		assert( resourceDescriptor != null );
-		
+		assert ( resourceDescriptor != null );
+
 		// Notify Listener
 		try {
 			wsl.onWebsocketHandshakeSentAsClient( this, this.handshakerequest );
