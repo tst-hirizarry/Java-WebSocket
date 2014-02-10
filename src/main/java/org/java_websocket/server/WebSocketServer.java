@@ -318,7 +318,6 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 							} catch ( IOException e ) {
 								throw e;
 							}
-
 							break;
 						}
 
@@ -404,7 +403,6 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 			}
 		}
 	}
-
 	protected void allocateBuffers( WebSocket c ) throws InterruptedException {
 		if( queuesize.get() >= 2 * decoders.size() + 1 ) {
 			return;
@@ -593,11 +591,11 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	public void onCloseInitiated( WebSocket conn, int code, String reason ) {
-	
+
 	}
 
 	public void onClosing( WebSocket conn, int code, String reason, boolean remote ) {
-
+		conn.closeConnection( code, reason );
 	}
 
 	public final void setWebSocketFactory( WebSocketServerFactory wsf ) {
