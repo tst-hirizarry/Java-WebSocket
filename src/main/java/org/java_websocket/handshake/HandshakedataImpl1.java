@@ -32,7 +32,7 @@ public class HandshakedataImpl1 implements HandshakeBuilder {
 	@Override
 	public String getFieldValue( String name ) {
 		String s = map.get( name );
-		if ( s == null ) {
+		if( s == null ) {
 			return "";
 		}
 		return s;

@@ -84,20 +84,21 @@ public abstract class WebSocketAdapter implements WebSocketListener {
 	 * 
 	 * @return An XML String that comforts to Flash's security policy. You MUST
 	 *         not include the null char at the end, it is appended automatically.
-	 * @throws InvalidDataException thrown when some data that is required to generate the flash-policy like the websocket local port could not be obtained e.g because the websocket is not connected.
+	 * @throws InvalidDataException
+	 *             thrown when some data that is required to generate the flash-policy like the websocket local port could not be obtained e.g because the websocket is not connected.
 	 */
 	@Override
 	public String getFlashPolicy( WebSocket conn ) throws InvalidDataException {
 		InetSocketAddress adr = conn.getLocalSocketAddress();
-		if(null == adr){
+		if( null == adr ) {
 			throw new InvalidHandshakeException( "socket not bound" );
 		}
-		
+
 		StringBuffer sb = new StringBuffer( 90 );
 		sb.append( "<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"" );
-		sb.append(adr.getPort());
+		sb.append( adr.getPort() );
 		sb.append( "\" /></cross-domain-policy>\0" );
-		
+
 		return sb.toString();
 	}
 

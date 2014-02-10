@@ -43,9 +43,7 @@ import org.java_websocket.handshake.Handshakedata;
 import org.java_websocket.handshake.ServerHandshakeBuilder;
 
 /**
- * <tt>WebSocketServer</tt> is an abstract class that only takes care of the
- * HTTP handshake portion of WebSockets. It's up to a subclass to add
- * functionality/purpose to the server.
+ * <tt>WebSocketServer</tt> is an abstract class that only takes care of the HTTP handshake portion of WebSockets. It's up to a subclass to add functionality/purpose to the server.
  * 
  */
 public abstract class WebSocketServer extends WebSocketAdapter implements Runnable {
@@ -53,13 +51,11 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	public static int DECODERS = Runtime.getRuntime().availableProcessors();
 
 	/**
-	 * Holds the list of active WebSocket connections. "Active" means WebSocket
-	 * handshake is complete and socket can be written to, or read from.
+	 * Holds the list of active WebSocket connections. "Active" means WebSocket handshake is complete and socket can be written to, or read from.
 	 */
 	private final Collection<WebSocket> connections;
 	/**
-	 * The port number that this WebSocket server should listen on. Default is
-	 * WebSocket.DEFAULT_PORT.
+	 * The port number that this WebSocket server should listen on. Default is WebSocket.DEFAULT_PORT.
 	 */
 	private final InetSocketAddress address;
 	/**
@@ -89,8 +85,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	private WebSocketServerFactory wsf = new DefaultWebSocketServerFactory();
 
 	/**
-	 * Creates a WebSocketServer that will attempt to
-	 * listen on port <var>WebSocket.DEFAULT_PORT</var>.
+	 * Creates a WebSocketServer that will attempt to listen on port <var>WebSocket.DEFAULT_PORT</var>.
 	 * 
 	 * @see #WebSocketServer(InetSocketAddress, int, List, Collection) more details here
 	 */
@@ -129,16 +124,14 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	/**
-	 * Creates a WebSocketServer that will attempt to bind/listen on the given <var>address</var>,
-	 * and comply with <tt>Draft</tt> version <var>draft</var>.
+	 * Creates a WebSocketServer that will attempt to bind/listen on the given <var>address</var>, and comply with <tt>Draft</tt> version <var>draft</var>.
 	 * 
 	 * @param address
 	 *            The address (host:port) this server should listen on.
 	 * @param decodercount
 	 *            The number of {@link WebSocketWorker}s that will be used to process the incoming network data. By default this will be <code>Runtime.getRuntime().availableProcessors()</code>
 	 * @param drafts
-	 *            The versions of the WebSocket protocol that this server
-	 *            instance should comply to. Clients that use an other protocol version will be rejected.
+	 *            The versions of the WebSocket protocol that this server instance should comply to. Clients that use an other protocol version will be rejected.
 	 * 
 	 * @param connectionscontainer
 	 *            Allows to specify a collection that will be used to store the websockets in. <br>
@@ -173,8 +166,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	/**
-	 * Starts the server selectorthread that binds to the currently set port number and
-	 * listeners for WebSocket connection requests. Creates a fixed thread pool with the size {@link WebSocketServer#DECODERS}<br>
+	 * Starts the server selectorthread that binds to the currently set port number and listeners for WebSocket connection requests. Creates a fixed thread pool with the size {@link WebSocketServer#DECODERS}<br>
 	 * May only be called once.
 	 * 
 	 * Alternatively you can call {@link WebSocketServer#run()} directly.
@@ -188,9 +180,8 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	/**
-	 * Closes all connected clients sockets, then closes the underlying
-	 * ServerSocketChannel, effectively killing the server socket selectorthread,
-	 * freeing the port the server was bound to and stops all internal workerthreads.
+	 * Closes all connected clients sockets, then closes the underlying ServerSocketChannel, effectively killing the server socket selectorthread, freeing the port the server was bound to
+	 * and stops all internal workerthreads.
 	 * 
 	 * If this method is called before the server is started it will never start.
 	 * 
@@ -231,14 +222,13 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 			}
 		}
 	}
+
 	public void stop() throws IOException , InterruptedException {
 		stop( 0 );
 	}
 
 	/**
-	 * Returns a WebSocket[] of currently connected clients.
-	 * Its iterators will be failfast and its not judicious
-	 * to modify it.
+	 * Returns a WebSocket[] of currently connected clients. Its iterators will be failfast and its not judicious to modify it.
 	 * 
 	 * @return The currently connected clients.
 	 */
@@ -320,7 +310,16 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 							w.channel = wsf.wrapChannel( channel, w.key );
 							i.remove();
 							allocateBuffers( w );
-							continue;
+							ByteBuffer buf = createBuffer();
+							try {
+								if( SocketChannelIOHelper.read( buf, w, w.channel ) ) {
+									w.decode( buf );
+								}
+							} catch ( IOException e ) {
+								throw e;
+							}
+
+							break;
 						}
 
 						if( key.isReadable() ) {
@@ -405,6 +404,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 			}
 		}
 	}
+
 	protected void allocateBuffers( WebSocket c ) throws InterruptedException {
 		if( queuesize.get() >= 2 * decoders.size() + 1 ) {
 			return;
@@ -471,17 +471,13 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	/**
-	 * Gets the XML string that should be returned if a client requests a Flash
-	 * security policy.
+	 * Gets the XML string that should be returned if a client requests a Flash security policy.
 	 * 
-	 * The default implementation allows access from all remote domains, but
-	 * only on the port that this WebSocketServer is listening on.
+	 * The default implementation allows access from all remote domains, but only on the port that this WebSocketServer is listening on.
 	 * 
-	 * This is specifically implemented for gitime's WebSocket client for Flash:
-	 * http://github.com/gimite/web-socket-js
+	 * This is specifically implemented for gitime's WebSocket client for Flash: http://github.com/gimite/web-socket-js
 	 * 
-	 * @return An XML String that comforms to Flash's security policy. You MUST
-	 *         not include the null char at the end, it is appended automatically.
+	 * @return An XML String that comforms to Flash's security policy. You MUST not include the null char at the end, it is appended automatically.
 	 */
 	protected String getFlashSecurityPolicy() {
 		return "<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"" + getPort() + "\" /></cross-domain-policy>";
@@ -494,7 +490,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 
 	@Override
 	@Deprecated
-	public/*final*/void onWebsocketMessageFragment( WebSocket conn, Framedata frame ) {// onFragment should be overloaded instead
+	public/* final */void onWebsocketMessageFragment( WebSocket conn, Framedata frame ) {// onFragment should be overloaded instead
 		onFragment( conn, frame );
 	}
 
@@ -544,6 +540,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 		}
 		return removed;
 	}
+
 	@Override
 	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, Draft draft, ClientHandshake request ) throws InvalidDataException {
 		return super.onWebsocketHandshakeReceivedAsServer( conn, draft, request );
@@ -563,6 +560,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 			return true;// for consistency sake we will make sure that both onOpen will be called
 		}
 	}
+
 	/**
 	 * @param conn
 	 *            may be null if the error does not belong to a single connection
@@ -598,7 +596,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	public void onClosing( WebSocket conn, int code, String reason, boolean remote ) {
-	    conn.closeConnection(code, reason);
+		conn.closeConnection( code, reason );
 	}
 
 	public final void setWebSocketFactory( WebSocketServerFactory wsf ) {
@@ -636,6 +634,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 
 	/** Called after an opening handshake has been performed and the given websocket is ready to be written on. */
 	public abstract void onOpen( WebSocket conn, ClientHandshake handshake );
+
 	/**
 	 * Called after the websocket connection has been closed.
 	 * 
@@ -647,12 +646,14 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	 *            Returns whether or not the closing of the connection was initiated by the remote host.
 	 **/
 	public abstract void onClose( WebSocket conn, int code, String reason, boolean remote );
+
 	/**
 	 * Callback for string messages received from the remote host
 	 * 
 	 * @see #onMessage(WebSocket, ByteBuffer)
 	 **/
 	public abstract void onMessage( WebSocket conn, String message );
+
 	/**
 	 * Called when errors occurs. If an error causes the websocket connection to fail {@link #onClose(WebSocket, int, String, boolean)} will be called additionally.<br>
 	 * This method will be called primarily because of IO or protocol errors.<br>
@@ -662,6 +663,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	 *            Can be null if there error does not belong to one specific websocket. For example if the servers port could not be bound.
 	 **/
 	public abstract void onError( WebSocket conn, Exception ex );
+
 	/**
 	 * Callback for binary messages received from the remote host
 	 * 
@@ -684,6 +686,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 			iqueue = new LinkedBlockingQueue<WebSocketImpl>();
 			setName( "WebSocketWorker-" + getId() );
 			setUncaughtExceptionHandler( new UncaughtExceptionHandler() {
+
 				@Override
 				public void uncaughtException( Thread t, Throwable e ) {
 					getDefaultUncaughtExceptionHandler().uncaughtException( t, e );
@@ -718,6 +721,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	public interface WebSocketServerFactory extends WebSocketFactory {
+
 		@Override
 		public WebSocketImpl createWebSocket( WebSocketAdapter a, Draft d, Socket s );
 
