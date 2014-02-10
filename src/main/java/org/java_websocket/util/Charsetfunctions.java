@@ -39,8 +39,8 @@ public class Charsetfunctions {
 	public static String stringAscii( byte[] bytes ) {
 		return stringAscii( bytes, 0, bytes.length );
 	}
-	
-	public static String stringAscii( byte[] bytes, int offset, int length ){
+
+	public static String stringAscii( byte[] bytes, int offset, int length ) {
 		try {
 			return new String( bytes, offset, length, "ASCII" );
 		} catch ( UnsupportedEncodingException e ) {
