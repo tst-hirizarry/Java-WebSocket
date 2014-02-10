@@ -7,7 +7,6 @@ import java.nio.channels.SocketChannel;
 
 import javax.net.ssl.SSLException;
 
-
 public class AbstractWrappedByteChannel implements WrappedByteChannel {
 
 	private final ByteChannel channel;

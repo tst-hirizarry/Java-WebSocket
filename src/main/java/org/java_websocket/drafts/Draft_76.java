@@ -28,9 +28,8 @@ import org.java_websocket.handshake.ServerHandshakeBuilder;
 public class Draft_76 extends Draft_75 {
 	private boolean failed = false;
 	private static final byte[] closehandshake = { -1, 0 };
-	
+
 	private final Random reuseableRandom = new Random();
-	
 
 	public static byte[] createChallenge( String key1, String key2, byte[] key3 ) throws InvalidHandshakeException {
 		byte[] part1 = getPart( key1 );
@@ -211,8 +210,7 @@ public class Draft_76 extends Draft_75 {
 				if( Arrays.equals( currentFrame.array(), closehandshake ) ) {
 					frames.add( new CloseFrameBuilder( CloseFrame.NORMAL ) );
 					return frames;
-				}
-				else{
+				} else {
 					throw new InvalidFrameException();
 				}
 			} else {
