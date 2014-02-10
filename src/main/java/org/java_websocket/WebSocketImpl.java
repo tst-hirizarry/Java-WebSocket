@@ -37,16 +37,15 @@ import org.java_websocket.server.WebSocketServer.WebSocketWorker;
 import org.java_websocket.util.Charsetfunctions;
 
 /**
- * Represents one end (client or server) of a single WebSocketImpl connection.
- * Takes care of the "handshake" phase, then allows for easy sending of
- * text frames, and receiving frames through an event-based model.
+ * Represents one end (client or server) of a single WebSocketImpl connection. Takes care of the "handshake" phase, then allows for easy sending of text frames, and receiving frames through
+ * an event-based model.
  * 
  */
 public class WebSocketImpl implements WebSocket {
 
 	public static int RCVBUF = 16384;
 
-	public static/*final*/boolean DEBUG = false; // must be final in the future in order to take advantage of VM optimization
+	public static/* final */boolean DEBUG = false; // must be final in the future in order to take advantage of VM optimization
 
 	public static final List<Draft> defaultdraftlist = new ArrayList<Draft>( 4 );
 	static {
@@ -155,7 +154,7 @@ public class WebSocketImpl implements WebSocket {
 			System.out.println( "process(" + socketBuffer.remaining() + "): {" + ( socketBuffer.remaining() > 1000 ? "too big to display" : new String( socketBuffer.array(), socketBuffer.position(), socketBuffer.remaining() ) ) + "}" );
 
 		if( readystate != READYSTATE.NOT_YET_CONNECTED ) {
-			decodeFrames( socketBuffer );;
+			decodeFrames( socketBuffer );
 		} else {
 			if( decodeHandshake( socketBuffer ) ) {
 				assert ( tmpHandshakeBytes.hasRemaining() != socketBuffer.hasRemaining() || !socketBuffer.hasRemaining() ); // the buffers will never have remaining bytes at the same time
@@ -169,9 +168,9 @@ public class WebSocketImpl implements WebSocket {
 		}
 		assert ( isClosing() || isFlushAndClose() || !socketBuffer.hasRemaining() );
 	}
+
 	/**
-	 * Returns whether the handshake phase has is completed.
-	 * In case of a broken handshake this will be never the case.
+	 * Returns whether the handshake phase has is completed. In case of a broken handshake this will be never the case.
 	 **/
 	private boolean decodeHandshake( ByteBuffer socketBufferNew ) {
 		ByteBuffer socketBuffer;
@@ -243,7 +242,7 @@ public class WebSocketImpl implements WebSocket {
 							}
 						}
 						if( draft == null ) {
-							close( CloseFrame.PROTOCOL_ERROR, "no draft matches" );
+							close( CloseFrame.PROTOCOL_ERROR, "wrong http function", false );
 						}
 						return false;
 					} else {
@@ -443,7 +442,8 @@ public class WebSocketImpl implements WebSocket {
 	 *            Indicates who "generated" <code>code</code>.<br>
 	 *            <code>true</code> means that this endpoint received the <code>code</code> from the other endpoint.<br>
 	 *            false means this endpoint decided to send the given code,<br>
-	 *            <code>remote</code> may also be true if this endpoint started the closing handshake since the other endpoint may not simply echo the <code>code</code> but close the connection the same time this endpoint does do but with an other <code>code</code>. <br>
+	 *            <code>remote</code> may also be true if this endpoint started the closing handshake since the other endpoint may not simply echo the <code>code</code> but close the
+	 *            connection the same time this endpoint does do but with an other <code>code</code>. <br>
 	 **/
 
 	protected synchronized void closeConnection( int code, String message, boolean remote ) {
@@ -640,13 +640,9 @@ public class WebSocketImpl implements WebSocket {
 			System.out.println( "write(" + buf.remaining() + "): {" + ( buf.remaining() > 1000 ? "too big to display" : new String( buf.array() ) ) + "}" );
 
 		outQueue.add( buf );
-		/*try {
-			outQueue.put( buf );
-		} catch ( InterruptedException e ) {
-			write( buf );
-			Thread.currentThread().interrupt(); // keep the interrupted status
-			e.printStackTrace();
-		}*/
+		/*
+		 * try { outQueue.put( buf ); } catch ( InterruptedException e ) { write( buf ); Thread.currentThread().interrupt(); // keep the interrupted status e.printStackTrace(); }
+		 */
 		wsl.onWriteDemand( this );
 	}
 

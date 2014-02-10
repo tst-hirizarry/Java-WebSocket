@@ -37,6 +37,7 @@ public abstract class Draft {
 		/** Handshake is does not match this Draft */
 		NOT_MATCHED
 	}
+
 	public enum CloseHandshakeType {
 		NONE, ONEWAY, TWOWAY
 	}
@@ -71,6 +72,32 @@ public abstract class Draft {
 		return null;
 	}
 
+	public static ByteBuffer readToPSlash( ByteBuffer buf ) {
+		ByteBuffer sbuf = ByteBuffer.allocate( buf.remaining() );
+		byte prev = '0';
+		byte cur = '0';
+		while ( buf.hasRemaining() ) {
+			prev = cur;
+			cur = buf.get();
+			sbuf.put( cur );
+			if( prev == (byte) 'P' && cur == (byte) '/' ) {
+				sbuf.limit( sbuf.position() - 2 );
+				sbuf.position( 0 );
+				buf.position( buf.position() - sbuf.position() );
+				return sbuf;
+
+			}
+		}
+		// ensure that there wont be any bytes skipped
+		buf.position( buf.position() - sbuf.position() );
+		return null;
+	}
+
+	public static String readStringToPSlash( ByteBuffer buf ) {
+		ByteBuffer b = readLine( buf );
+		return b == null ? null : Charsetfunctions.stringAscii( b.array(), 0, b.limit() );
+	}
+
 	public static String readStringLine( ByteBuffer buf ) {
 		ByteBuffer b = readLine( buf );
 		return b == null ? null : Charsetfunctions.stringAscii( b.array(), 0, b.limit() );
@@ -80,8 +107,18 @@ public abstract class Draft {
 		HandshakeBuilder handshake;
 
 		String line = readStringLine( buf );
-		if( line == null )
-			throw new IncompleteHandshakeException( buf.capacity() + 128 );
+		if( line == null ) {
+			try {
+				String httPPrefix = readStringToPSlash( buf );
+				if( httPPrefix != null && httPPrefix.equals( "HTTP/" ) ) {
+					throw new IncompleteHandshakeException( buf.capacity() + 128 );
+				}
+
+				throw new InvalidHandshakeException( "Unable parse HTTP headers. Looks like a client attempting to connect over SSL." );
+			} catch ( RuntimeException e ) {
+				throw new InvalidHandshakeException( "Unable parse HTTP headers. Looks like a client attempting to connect over SSL." );
+			}
+		}
 
 		String[] firstLineTokens = line.split( " ", 3 );// eg. HTTP/1.1 101 Switching the Protocols
 		if( firstLineTokens.length != 3 ) {
@@ -202,7 +239,8 @@ public abstract class Draft {
 	public abstract CloseHandshakeType getCloseHandshakeType();
 
 	/**
-	 * Drafts must only be by one websocket at all. To prevent drafts to be used more than once the Websocket implementation should call this method in order to create a new usable version of a given draft instance.<br>
+	 * Drafts must only be by one websocket at all. To prevent drafts to be used more than once the Websocket implementation should call this method in order to create a new usable version
+	 * of a given draft instance.<br>
 	 * The copy can be safely used in conjunction with a new websocket connection.
 	 * */
 	public abstract Draft copyInstance();
