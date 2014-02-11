@@ -28,6 +28,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.net.ssl.SSLException;
+
 import org.java_websocket.SocketChannelIOHelper;
 import org.java_websocket.WebSocket;
 import org.java_websocket.WebSocketAdapter;
@@ -293,7 +295,6 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 						key = i.next();
 
 						if( !key.isValid() ) {
-							// Object o = key.attachment();
 							continue;
 						}
 
@@ -305,20 +306,21 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 
 							SocketChannel channel = server.accept();
 							channel.configureBlocking( false );
-							WebSocketImpl w = wsf.createWebSocket( this, drafts, channel.socket() );
-							w.key = channel.register( selector, SelectionKey.OP_READ, w );
-							w.channel = wsf.wrapChannel( channel, w.key );
 							i.remove();
-							allocateBuffers( w );
-							ByteBuffer buf = createBuffer();
+							WebSocketImpl conn1 = null;
 							try {
-								if( SocketChannelIOHelper.read( buf, w, w.channel ) ) {
-									w.decode( buf );
+								conn1 = wsf.createWebSocket( this, drafts, channel.socket() );
+								conn1.key = channel.register( selector, SelectionKey.OP_READ, conn1 );
+								conn1.channel = wsf.wrapChannel( channel, conn1.key );
+								allocateBuffers( conn1 );
+							} catch ( SSLException e ) {
+								if( conn1 != null ) {
+									SocketChannelIOHelper.read( createBuffer(), conn1, channel );
+									conn1.close( CloseFrame.ABNORMAL_CLOSE, e.getMessage() );
 								}
-							} catch ( IOException e ) {
-								throw e;
 							}
-							break;
+
+							continue;
 						}
 
 						if( key.isReadable() ) {
