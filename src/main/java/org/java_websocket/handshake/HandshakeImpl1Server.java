@@ -25,5 +25,4 @@ public class HandshakeImpl1Server extends HandshakedataImpl1 implements ServerHa
 		httpstatus = status;
 	}
 
-
 }

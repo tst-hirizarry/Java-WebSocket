@@ -273,7 +273,7 @@ public class Draft_10 extends Draft {
 					incompleteframe.rewind();
 					extendedframe.put( incompleteframe );
 					incompleteframe = extendedframe;
-					
+
 					return translateFrame( buffer );
 				}
 			}
