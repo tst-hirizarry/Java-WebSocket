@@ -375,5 +375,9 @@ public class SSLSocketChannel2 implements ByteChannel, WrappedByteChannel {
 	public boolean isBlocking() {
 		return socketChannel.isBlocking();
 	}
+	
+	public SSLEngine getSslEngine() {
+		return sslEngine;
+	}
 
 }

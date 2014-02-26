@@ -29,7 +29,7 @@ import org.java_websocket.util.Charsetfunctions;
 /**
  * Base class for everything of a websocket specification which is not common such as the way the handshake is read or frames are transfered.
  **/
-public abstract class Draft {
+public abstract class Draft implements IDraft {
 
 	public enum HandshakeState {
 		/** Handshake matched this Draft successfully */
@@ -44,8 +44,6 @@ public abstract class Draft {
 
 	public static int MAX_FAME_SIZE = 1000 * 1;
 	public static int INITIAL_FAMESIZE = 64;
-
-	public static final byte[] FLASH_POLICY_REQUEST = Charsetfunctions.utf8Bytes( "<policy-file-request/>\0" );
 
 	/** In some cases the handshake will be parsed different depending on whether */
 	protected Role role = null;
@@ -151,20 +149,44 @@ public abstract class Draft {
 		return handshake;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#acceptHandshakeAsClient(org.java_websocket.handshake.ClientHandshake, org.java_websocket.handshake.ServerHandshake)
+	 */
+	@Override
 	public abstract HandshakeState acceptHandshakeAsClient( ClientHandshake request, ServerHandshake response ) throws InvalidHandshakeException;
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#acceptHandshakeAsServer(org.java_websocket.handshake.ClientHandshake)
+	 */
+	@Override
 	public abstract HandshakeState acceptHandshakeAsServer( ClientHandshake handshakedata ) throws InvalidHandshakeException;
 
 	protected boolean basicAccept( Handshakedata handshakedata ) {
 		return handshakedata.getFieldValue( "Upgrade" ).equalsIgnoreCase( "websocket" ) && handshakedata.getFieldValue( "Connection" ).toLowerCase( Locale.ENGLISH ).contains( "upgrade" );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#createBinaryFrame(org.java_websocket.framing.Framedata)
+	 */
+	@Override
 	public abstract ByteBuffer createBinaryFrame( Framedata framedata ); // TODO Allow to send data on the base of an Iterator or InputStream
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#createFrames(java.nio.ByteBuffer, boolean)
+	 */
+	@Override
 	public abstract List<Framedata> createFrames( ByteBuffer binary, boolean mask );
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#createFrames(java.lang.String, boolean)
+	 */
+	@Override
 	public abstract List<Framedata> createFrames( String text, boolean mask );
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#continuousFrame(org.java_websocket.framing.Framedata.Opcode, java.nio.ByteBuffer, boolean)
+	 */
+	@Override
 	public List<Framedata> continuousFrame( Opcode op, ByteBuffer buffer, boolean fin ) {
 		if( op != Opcode.BINARY && op != Opcode.TEXT && op != Opcode.TEXT ) {
 			throw new IllegalArgumentException( "Only Opcode.BINARY or  Opcode.TEXT are allowed" );
@@ -191,12 +213,24 @@ public abstract class Draft {
 		return Collections.singletonList( (Framedata) bui );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#reset()
+	 */
+	@Override
 	public abstract void reset();
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#createHandshake(org.java_websocket.handshake.Handshakedata, org.java_websocket.WebSocket.Role)
+	 */
+	@Override
 	public List<ByteBuffer> createHandshake( Handshakedata handshakedata, Role ownrole ) {
 		return createHandshake( handshakedata, ownrole, true );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#createHandshake(org.java_websocket.handshake.Handshakedata, org.java_websocket.WebSocket.Role, boolean)
+	 */
+	@Override
 	public List<ByteBuffer> createHandshake( Handshakedata handshakedata, Role ownrole, boolean withcontent ) {
 		StringBuilder bui = new StringBuilder( 100 );
 		if( handshakedata instanceof ClientHandshake ) {
@@ -230,35 +264,66 @@ public abstract class Draft {
 		return Collections.singletonList( bytebuffer );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#postProcessHandshakeRequestAsClient(org.java_websocket.handshake.ClientHandshakeBuilder)
+	 */
+	@Override
 	public abstract ClientHandshakeBuilder postProcessHandshakeRequestAsClient( ClientHandshakeBuilder request ) throws InvalidHandshakeException;
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#postProcessHandshakeResponseAsServer(org.java_websocket.handshake.ClientHandshake, org.java_websocket.handshake.ServerHandshakeBuilder)
+	 */
+	@Override
 	public abstract HandshakeBuilder postProcessHandshakeResponseAsServer( ClientHandshake request, ServerHandshakeBuilder response ) throws InvalidHandshakeException;
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#translateFrame(java.nio.ByteBuffer)
+	 */
+	@Override
 	public abstract List<Framedata> translateFrame( ByteBuffer buffer ) throws InvalidDataException;
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#getCloseHandshakeType()
+	 */
+	@Override
 	public abstract CloseHandshakeType getCloseHandshakeType();
 
-	/**
-	 * Drafts must only be by one websocket at all. To prevent drafts to be used more than once the Websocket implementation should call this method in order to create a new usable version
-	 * of a given draft instance.<br>
-	 * The copy can be safely used in conjunction with a new websocket connection.
-	 * */
-	public abstract Draft copyInstance();
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#copyInstance()
+	 */
+	@Override
+	public abstract IDraft copyInstance();
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#translateHandshake(java.nio.ByteBuffer)
+	 */
+	@Override
 	public Handshakedata translateHandshake( ByteBuffer buf ) throws InvalidHandshakeException {
 		return translateHandshakeHttp( buf, role );
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#checkAlloc(int)
+	 */
+	@Override
 	public int checkAlloc( int bytecount ) throws LimitExedeedException , InvalidDataException {
 		if( bytecount < 0 )
 			throw new InvalidDataException( CloseFrame.PROTOCOL_ERROR, "Negative count" );
 		return bytecount;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#setParseMode(org.java_websocket.WebSocket.Role)
+	 */
+	@Override
 	public void setParseMode( Role role ) {
 		this.role = role;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.java_websocket.drafts.IDraft#getRole()
+	 */
+	@Override
 	public Role getRole() {
 		return role;
 	}

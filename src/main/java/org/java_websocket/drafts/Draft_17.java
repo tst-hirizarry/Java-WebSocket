@@ -21,7 +21,7 @@ public class Draft_17 extends Draft_10 {
 	}
 
 	@Override
-	public Draft copyInstance() {
+	public IDraft copyInstance() {
 		return new Draft_17();
 	}
 

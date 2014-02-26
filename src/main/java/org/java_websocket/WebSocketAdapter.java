@@ -3,6 +3,7 @@ package org.java_websocket;
 import java.net.InetSocketAddress;
 
 import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.IDraft;
 import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.exceptions.InvalidHandshakeException;
 import org.java_websocket.framing.Framedata;
@@ -24,7 +25,7 @@ public abstract class WebSocketAdapter implements WebSocketListener {
 	 * @see org.java_websocket.WebSocketListener#onWebsocketHandshakeReceivedAsServer(WebSocket, Draft, ClientHandshake)
 	 */
 	@Override
-	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, Draft draft, ClientHandshake request ) throws InvalidDataException {
+	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, IDraft draft, ClientHandshake request ) throws InvalidDataException {
 		return new HandshakeImpl1Server();
 	}
 

@@ -15,8 +15,8 @@ import java.util.concurrent.CountDownLatch;
 import org.java_websocket.WebSocket;
 import org.java_websocket.WebSocketAdapter;
 import org.java_websocket.WebSocketImpl;
-import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_17;
+import org.java_websocket.drafts.IDraft;
 import org.java_websocket.exceptions.InvalidHandshakeException;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.framing.Framedata;
@@ -48,7 +48,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 
 	private Thread writeThread;
 
-	private Draft draft;
+	private IDraft draft;
 
 	private Map<String,String> headers;
 
@@ -68,11 +68,11 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * specified URI. The channel does not attampt to connect automatically. The connection
 	 * will be established once you call <var>connect</var>.
 	 */
-	public WebSocketClient( URI serverUri , Draft draft ) {
+	public WebSocketClient( URI serverUri , IDraft draft ) {
 		this( serverUri, draft, null, 0 );
 	}
 
-	public WebSocketClient( URI serverUri , Draft protocolDraft , Map<String,String> httpHeaders , int connectTimeout ) {
+	public WebSocketClient( URI serverUri , IDraft protocolDraft , Map<String,String> httpHeaders , int connectTimeout ) {
 		if( serverUri == null ) {
 			throw new IllegalArgumentException();
 		} else if( protocolDraft == null ) {
@@ -96,7 +96,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * Returns the protocol version this channel uses.<br>
 	 * For more infos see https://github.com/TooTallNate/Java-WebSocket/wiki/Drafts
 	 */
-	public Draft getDraft() {
+	public IDraft getDraft() {
 		return draft;
 	}
 

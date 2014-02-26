@@ -234,7 +234,7 @@ public class Draft_76 extends Draft_75 {
 	}
 
 	@Override
-	public Draft copyInstance() {
+	public IDraft copyInstance() {
 		return new Draft_76();
 	}
 }

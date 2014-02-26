@@ -8,15 +8,16 @@ import java.util.List;
 import org.java_websocket.WebSocketAdapter;
 import org.java_websocket.WebSocketImpl;
 import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.IDraft;
 import org.java_websocket.server.WebSocketServer.WebSocketServerFactory;
 
 public class DefaultWebSocketServerFactory implements WebSocketServerFactory {
 	@Override
-	public WebSocketImpl createWebSocket( WebSocketAdapter a, Draft d, Socket s ) {
+	public WebSocketImpl createWebSocket( WebSocketAdapter a, IDraft d, Socket s ) {
 		return new WebSocketImpl( a, d );
 	}
 	@Override
-	public WebSocketImpl createWebSocket( WebSocketAdapter a, List<Draft> d, Socket s ) {
+	public WebSocketImpl createWebSocket( WebSocketAdapter a, List<IDraft> d, Socket s ) {
 		return new WebSocketImpl( a, d );
 	}
 	@Override

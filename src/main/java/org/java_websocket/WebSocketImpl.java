@@ -20,6 +20,8 @@ import org.java_websocket.drafts.Draft_10;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.drafts.Draft_75;
 import org.java_websocket.drafts.Draft_76;
+import org.java_websocket.drafts.IDraft;
+import org.java_websocket.drafts.IChannelAccessDraft;
 import org.java_websocket.exceptions.IncompleteHandshakeException;
 import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.exceptions.InvalidHandshakeException;
@@ -47,7 +49,7 @@ public class WebSocketImpl implements WebSocket {
 
 	public static/* final */boolean DEBUG = false; // must be final in the future in order to take advantage of VM optimization
 
-	public static final List<Draft> defaultdraftlist = new ArrayList<Draft>( 4 );
+	public static final List<IDraft> defaultdraftlist = new ArrayList<IDraft>( 4 );
 	static {
 		defaultdraftlist.add( new Draft_17() );
 		defaultdraftlist.add( new Draft_10() );
@@ -83,9 +85,9 @@ public class WebSocketImpl implements WebSocket {
 	 */
 	private final WebSocketListener wsl;
 
-	private List<Draft> knownDrafts;
+	private List<IDraft> knownDrafts;
 
-	private Draft draft = null;
+	private IDraft draft = null;
 
 	private Role role;
 
@@ -106,8 +108,8 @@ public class WebSocketImpl implements WebSocket {
 	/**
 	 * crates a websocket with server role
 	 */
-	public WebSocketImpl( WebSocketListener listener , List<Draft> drafts ) {
-		this( listener, (Draft) null );
+	public WebSocketImpl( WebSocketListener listener , List<IDraft> drafts ) {
+		this( listener, (IDraft) null );
 		this.role = Role.SERVER;
 		// draft.copyInstance will be called when the draft is first needed
 		if( drafts == null || drafts.isEmpty() ) {
@@ -123,7 +125,7 @@ public class WebSocketImpl implements WebSocket {
 	 * @param socket
 	 *            may be unbound
 	 */
-	public WebSocketImpl( WebSocketListener listener , Draft draft ) {
+	public WebSocketImpl( WebSocketListener listener , IDraft draft ) {
 		if( listener == null || ( draft == null && role == Role.SERVER ) )// socket can be null because we want do be able to create the object without already having a bound channel
 			throw new IllegalArgumentException( "parameters must not be null" );
 		this.outQueue = new LinkedBlockingQueue<ByteBuffer>();
@@ -135,12 +137,12 @@ public class WebSocketImpl implements WebSocket {
 	}
 
 	@Deprecated
-	public WebSocketImpl( WebSocketListener listener , Draft draft , Socket socket ) {
+	public WebSocketImpl( WebSocketListener listener , IDraft draft , Socket socket ) {
 		this( listener, draft );
 	}
 
 	@Deprecated
-	public WebSocketImpl( WebSocketListener listener , List<Draft> drafts , Socket socket ) {
+	public WebSocketImpl( WebSocketListener listener , List<IDraft> drafts , Socket socket ) {
 		this( listener, drafts );
 	}
 
@@ -207,7 +209,7 @@ public class WebSocketImpl implements WebSocket {
 			try {
 				if( role == Role.SERVER ) {
 					if( draft == null ) {
-						for( Draft d : knownDrafts ) {
+						for( IDraft d : knownDrafts ) {
 							d = d.copyInstance();
 							try {
 								d.setParseMode( role );
@@ -218,6 +220,9 @@ public class WebSocketImpl implements WebSocket {
 									return false;
 								}
 								ClientHandshake handshake = (ClientHandshake) tmphandshake;
+								if( d instanceof IChannelAccessDraft ) {
+									( (IChannelAccessDraft) d ).setChannel( this.channel );
+								}
 								handshakestate = d.acceptHandshakeAsServer( handshake );
 								if( handshakestate == HandshakeState.MATCHED ) {
 									resourceDescriptor = handshake.getResourceDescriptor();
@@ -595,14 +600,14 @@ public class WebSocketImpl implements WebSocket {
 
 	private HandshakeState isFlashEdgeCase( ByteBuffer request ) throws IncompleteHandshakeException {
 		request.mark();
-		if( request.limit() > Draft.FLASH_POLICY_REQUEST.length ) {
+		if( request.limit() > IDraft.FLASH_POLICY_REQUEST.length ) {
 			return HandshakeState.NOT_MATCHED;
-		} else if( request.limit() < Draft.FLASH_POLICY_REQUEST.length ) {
-			throw new IncompleteHandshakeException( Draft.FLASH_POLICY_REQUEST.length );
+		} else if( request.limit() < IDraft.FLASH_POLICY_REQUEST.length ) {
+			throw new IncompleteHandshakeException( IDraft.FLASH_POLICY_REQUEST.length );
 		} else {
 
 			for( int flash_policy_index = 0 ; request.hasRemaining() ; flash_policy_index++ ) {
-				if( Draft.FLASH_POLICY_REQUEST[ flash_policy_index ] != request.get() ) {
+				if( IDraft.FLASH_POLICY_REQUEST[ flash_policy_index ] != request.get() ) {
 					request.reset();
 					return HandshakeState.NOT_MATCHED;
 				}
@@ -716,7 +721,7 @@ public class WebSocketImpl implements WebSocket {
 	}
 
 	@Override
-	public Draft getDraft() {
+	public IDraft getDraft() {
 		return draft;
 	}
 

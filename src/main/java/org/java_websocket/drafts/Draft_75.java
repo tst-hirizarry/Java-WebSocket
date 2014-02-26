@@ -200,7 +200,7 @@ public class Draft_75 extends Draft {
 	}
 
 	@Override
-	public Draft copyInstance() {
+	public IDraft copyInstance() {
 		return new Draft_75();
 	}
 }

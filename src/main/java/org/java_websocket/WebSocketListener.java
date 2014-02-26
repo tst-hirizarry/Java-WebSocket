@@ -3,7 +3,7 @@ package org.java_websocket;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
-import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.IDraft;
 import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ClientHandshake;
@@ -33,7 +33,7 @@ public interface WebSocketListener {
 	 * @throws InvalidDataException
 	 *             Throwing this exception will cause this handshake to be rejected
 	 */
-	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, Draft draft, ClientHandshake request ) throws InvalidDataException;
+	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, IDraft draft, ClientHandshake request ) throws InvalidDataException;
 
 	/**
 	 * Called on the client side when the socket connection is first established, and the WebSocketImpl

@@ -37,6 +37,7 @@ import org.java_websocket.WebSocketFactory;
 import org.java_websocket.WebSocketImpl;
 import org.java_websocket.WrappedByteChannel;
 import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.IDraft;
 import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.framing.Framedata;
@@ -71,7 +72,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	/**
 	 * The Draft of the WebSocket protocol the Server is adhering to.
 	 */
-	private List<Draft> drafts;
+	private List<IDraft> drafts;
 
 	private Thread selectorthread;
 
@@ -114,14 +115,14 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	/**
 	 * @see #WebSocketServer(InetSocketAddress, int, List, Collection) more details here
 	 */
-	public WebSocketServer( InetSocketAddress address , List<Draft> drafts ) {
+	public WebSocketServer( InetSocketAddress address , List<IDraft> drafts ) {
 		this( address, DECODERS, drafts );
 	}
 
 	/**
 	 * @see #WebSocketServer(InetSocketAddress, int, List, Collection) more details here
 	 */
-	public WebSocketServer( InetSocketAddress address , int decodercount , List<Draft> drafts ) {
+	public WebSocketServer( InetSocketAddress address , int decodercount , List<IDraft> drafts ) {
 		this( address, decodercount, drafts, new HashSet<WebSocket>() );
 	}
 
@@ -143,7 +144,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	 * @see #removeConnection(WebSocket) for more control over syncronized operation
 	 * @see <a href="https://github.com/TooTallNate/Java-WebSocket/wiki/Drafts" > more about drafts
 	 */
-	public WebSocketServer( InetSocketAddress address , int decodercount , List<Draft> drafts , Collection<WebSocket> connectionscontainer ) {
+	public WebSocketServer( InetSocketAddress address , int decodercount , List<IDraft> drafts , Collection<WebSocket> connectionscontainer ) {
 		if( address == null || decodercount < 1 || connectionscontainer == null ) {
 			throw new IllegalArgumentException( "address and connectionscontainer must not be null and you need at least 1 decoder" );
 		}
@@ -255,7 +256,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 		return port;
 	}
 
-	public List<Draft> getDraft() {
+	public List<IDraft> getDraft() {
 		return Collections.unmodifiableList( drafts );
 	}
 
@@ -542,7 +543,7 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	@Override
-	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, Draft draft, ClientHandshake request ) throws InvalidDataException {
+	public ServerHandshakeBuilder onWebsocketHandshakeReceivedAsServer( WebSocket conn, IDraft draft, ClientHandshake request ) throws InvalidDataException {
 		return super.onWebsocketHandshakeReceivedAsServer( conn, draft, request );
 	}
 
@@ -724,9 +725,9 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	public interface WebSocketServerFactory extends WebSocketFactory {
 
 		@Override
-		public WebSocketImpl createWebSocket( WebSocketAdapter a, Draft d, Socket s );
+		public WebSocketImpl createWebSocket( WebSocketAdapter a, IDraft d, Socket s );
 
-		public WebSocketImpl createWebSocket( WebSocketAdapter a, List<Draft> drafts, Socket s );
+		public WebSocketImpl createWebSocket( WebSocketAdapter a, List<IDraft> drafts, Socket s );
 
 		/**
 		 * Allows to wrap the Socketchannel( key.channel() ) to insert a protocol layer( like ssl or proxy authentication) beyond the ws layer.

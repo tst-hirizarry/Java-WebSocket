@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.NotYetConnectedException;
 
-import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.IDraft;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.framing.Framedata.Opcode;
 
@@ -105,7 +105,7 @@ public interface WebSocket {
 	/** Returns whether the close handshake has been completed and the socket is closed. */
 	public abstract boolean isClosed();
 
-	public abstract Draft getDraft();
+	public abstract IDraft getDraft();
 
 	/**
 	 * Retrieve the WebSocket 'readyState'.
