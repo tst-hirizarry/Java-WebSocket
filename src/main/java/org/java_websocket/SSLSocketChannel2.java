@@ -34,7 +34,7 @@ public class SSLSocketChannel2 implements ByteChannel, WrappedByteChannel {
 	/**
 	 * This object is used to feed the {@link SSLEngine}'s wrap and unwrap methods during the handshake phase.
 	 **/
-	protected static ByteBuffer emptybuffer = ByteBuffer.allocate( 0 );
+	protected static ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate( 0 );
 
 	protected ExecutorService exec;
 
@@ -79,7 +79,7 @@ public class SSLSocketChannel2 implements ByteChannel, WrappedByteChannel {
 		}
 		createBuffers( sslEngine.getSession() );
 		// kick off handshake
-		socketChannel.write( wrap( emptybuffer ) );// initializes res
+		socketChannel.write( wrap( EMPTY_BUFFER ) );// initializes res
 		processHandshake();
 	}
 
@@ -140,7 +140,7 @@ public class SSLSocketChannel2 implements ByteChannel, WrappedByteChannel {
 		}
 		consumeDelegatedTasks();
 		if( tasks.isEmpty() || sslEngine.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_WRAP ) {
-			socketChannel.write( wrap( emptybuffer ) );
+			socketChannel.write( wrap( EMPTY_BUFFER ) );
 			if( writeEngineResult.getHandshakeStatus() == HandshakeStatus.FINISHED ) {
 				createBuffers( sslEngine.getSession() );
 				return;
@@ -300,7 +300,7 @@ public class SSLSocketChannel2 implements ByteChannel, WrappedByteChannel {
 		sslEngine.closeOutbound();
 		sslEngine.getSession().invalidate();
 		if( socketChannel.isOpen() )
-			socketChannel.write( wrap( emptybuffer ) );// FIXME what if not all bytes can be written
+			socketChannel.write( wrap( EMPTY_BUFFER ) );// FIXME what if not all bytes can be written
 		socketChannel.close();
 	}
 

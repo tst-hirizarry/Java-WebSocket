@@ -14,7 +14,6 @@ import javax.net.ssl.SSLEngine;
 import org.java_websocket.SSLSocketChannel2;
 import org.java_websocket.WebSocketAdapter;
 import org.java_websocket.WebSocketImpl;
-import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.IDraft;
 
 public class DefaultSSLWebSocketServerFactory implements WebSocketServer.WebSocketServerFactory {
