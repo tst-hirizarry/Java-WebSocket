@@ -38,33 +38,37 @@ public class SocketChannelIOHelper {
 
 	/** Returns whether the whole outQueue has been flushed */
 	public static boolean batch( WebSocketImpl ws, ByteChannel sockchannel ) throws IOException {
-		ByteBuffer buffer = ws.outQueue.peek();
-		WrappedByteChannel c = null;
+		try {
+			ByteBuffer buffer = ws.outQueue.peek();
+			WrappedByteChannel c = null;
 
-		if( buffer == null ) {
-			if( sockchannel instanceof WrappedByteChannel ) {
-				c = (WrappedByteChannel) sockchannel;
-				if( c.isNeedWrite() ) {
-					c.writeMore();
+			if( buffer == null ) {
+				if( sockchannel instanceof WrappedByteChannel ) {
+					c = (WrappedByteChannel) sockchannel;
+					if( c.isNeedWrite() ) {
+						c.writeMore();
+					}
+				}
+			} else {
+				do {// FIXME writing as much as possible is unfair!!
+					/*int written = */sockchannel.write( buffer );
+					if( buffer.remaining() > 0 ) {
+						return false;
+					} else {
+						ws.outQueue.poll(); // Buffer finished. Remove it.
+						buffer = ws.outQueue.peek();
+					}
+				} while ( buffer != null );
+			}
+
+			if( ws.outQueue.isEmpty() && ws.isFlushAndClose() && ws.getDraft().getRole() == Role.SERVER ) {//
+				synchronized ( ws ) {
+					ws.closeConnection();
 				}
 			}
-		} else {
-			do {// FIXME writing as much as possible is unfair!!
-				/*int written = */sockchannel.write( buffer );
-				if( buffer.remaining() > 0 ) {
-					return false;
-				} else {
-					ws.outQueue.poll(); // Buffer finished. Remove it.
-					buffer = ws.outQueue.peek();
-				}
-			} while ( buffer != null );
+			return c != null ? !( (WrappedByteChannel) sockchannel ).isNeedWrite() : true;
+		} catch ( NullPointerException e ) {
+			throw new IOException( e );
 		}
-
-		if( ws.outQueue.isEmpty() && ws.isFlushAndClose() && ws.getDraft().getRole() == Role.SERVER ) {//
-			synchronized ( ws ) {
-				ws.closeConnection();
-			}
-		}
-		return c != null ? !( (WrappedByteChannel) sockchannel ).isNeedWrite() : true;
 	}
 }
