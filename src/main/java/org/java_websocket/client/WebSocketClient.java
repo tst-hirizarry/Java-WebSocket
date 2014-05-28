@@ -162,10 +162,6 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 			} else if( socket.isClosed() ) {
 				throw new IOException();
 			}
-			socket.setSendBufferSize( socket.getSendBufferSize() * 2 );
-			System.out.println( socket.getSendBufferSize() );
-			socket.setReceiveBufferSize( socket.getReceiveBufferSize() * 2 );
-			System.out.println( socket.getReceiveBufferSize() );
 			if( !socket.isBound() ) {
 				socket.connect( new InetSocketAddress( uri.getHost(), getPort() ), connectTimeout );
 			}
