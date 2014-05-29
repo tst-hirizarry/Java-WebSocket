@@ -68,7 +68,15 @@ public class SocketChannelIOHelper {
 			}
 			return c != null ? !( (WrappedByteChannel) sockchannel ).isNeedWrite() : true;
 		} catch ( NullPointerException e ) {
-			throw new IOException( e );
+			throw new BatchWriteException( e );
+		}
+	}
+	public static class BatchWriteException extends RuntimeException {
+
+		private static final long serialVersionUID = 5502276757208324319L;
+
+		public BatchWriteException( Throwable e ) {
+			super( e );
 		}
 	}
 }

@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.net.ssl.SSLException;
 
 import org.java_websocket.SocketChannelIOHelper;
+import org.java_websocket.SocketChannelIOHelper.BatchWriteException;
 import org.java_websocket.WebSocket;
 import org.java_websocket.WebSocketAdapter;
 import org.java_websocket.WebSocketFactory;
@@ -385,6 +386,18 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 					handleIOException( key, conn, ex );
 				} catch ( InterruptedException e ) {
 					return;// FIXME controlled shutdown (e.g. take care of buffermanagement)
+				} catch ( BatchWriteException e ) {
+					if( key != null ) {
+						key.cancel();
+						SelectableChannel channel = key.channel();
+						if( channel != null ) { // this could be the case if the IOException ex is a SSLException
+							try {
+								channel.close();
+							} catch ( IOException e1 ) {
+								// there is nothing that must be done here
+							}
+						}
+					}
 				}
 			}
 
