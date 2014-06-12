@@ -456,20 +456,24 @@ public abstract class WebSocketServer extends WebSocketAdapter implements Runnab
 	}
 
 	private void handleIOException( SelectionKey key, WebSocket conn, Exception ex ) {
-		// onWebsocketError( conn, ex );// conn may be null here
-		if( conn != null ) {
-			conn.closeConnection( CloseFrame.ABNORMAL_CLOSE, ex.getMessage() );
-		} else if( key != null ) {
-			SelectableChannel channel = key.channel();
-			if( channel != null && channel.isOpen() ) { // this could be the case if the IOException ex is a SSLException
-				try {
-					channel.close();
-				} catch ( IOException e ) {
-					// there is nothing that must be done here
+		try {
+			if( conn != null ) {
+				conn.closeConnection( CloseFrame.ABNORMAL_CLOSE, ex.getMessage() );
+			} else if( key != null ) {
+				SelectableChannel channel = key.channel();
+				if( channel != null && channel.isOpen() ) { // this could be the case if the IOException ex is a SSLException
+					try {
+						channel.close();
+					} catch ( IOException e ) {
+						// there is nothing that must be done here
+					}
+					if( WebSocketImpl.DEBUG )
+						System.out.println( "Connection closed because of" + ex );
 				}
-				if( WebSocketImpl.DEBUG )
-					System.out.println( "Connection closed because of" + ex );
 			}
+		} catch ( WebsocketNotConnectedException e ) {
+			if( WebSocketImpl.DEBUG )
+				System.out.println( "Error occurred closing" + ex );
 		}
 	}
 

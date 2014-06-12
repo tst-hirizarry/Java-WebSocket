@@ -57,7 +57,7 @@ public interface IDraft {
 	 * */
 	public abstract IDraft copyInstance();
 
-	public abstract Handshakedata translateHandshake( ByteBuffer buf ) throws InvalidHandshakeException;
+	public abstract Handshakedata translateHandshake( ByteBuffer buf ) throws InvalidHandshakeException, IncompleteHandshakeException;
 
 	public abstract int checkAlloc( int bytecount ) throws LimitExedeedException , InvalidDataException;
 
