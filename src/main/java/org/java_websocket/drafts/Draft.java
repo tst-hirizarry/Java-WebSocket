@@ -153,7 +153,7 @@ public abstract class Draft implements IDraft {
 	 * @see org.java_websocket.drafts.IDraft#acceptHandshakeAsClient(org.java_websocket.handshake.ClientHandshake, org.java_websocket.handshake.ServerHandshake)
 	 */
 	@Override
-	public abstract HandshakeState acceptHandshakeAsClient( ClientHandshake request, ServerHandshake response ) throws InvalidHandshakeException;
+	public abstract HandshakeState acceptHandshakeAsClient( ClientHandshake request, ServerHandshake response ) throws InvalidHandshakeException, IncompleteHandshakeException;
 
 	/* (non-Javadoc)
 	 * @see org.java_websocket.drafts.IDraft#acceptHandshakeAsServer(org.java_websocket.handshake.ClientHandshake)
@@ -298,7 +298,7 @@ public abstract class Draft implements IDraft {
 	 * @see org.java_websocket.drafts.IDraft#translateHandshake(java.nio.ByteBuffer)
 	 */
 	@Override
-	public Handshakedata translateHandshake( ByteBuffer buf ) throws InvalidHandshakeException {
+	public Handshakedata translateHandshake( ByteBuffer buf ) throws InvalidHandshakeException, IncompleteHandshakeException {
 		return translateHandshakeHttp( buf, role );
 	}
 

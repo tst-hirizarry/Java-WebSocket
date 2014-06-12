@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import org.java_websocket.exceptions.IncompleteHandshakeException;
 import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.exceptions.InvalidFrameException;
 import org.java_websocket.exceptions.InvalidHandshakeException;
@@ -51,7 +52,7 @@ public class Draft_75 extends Draft {
 	private final Random reuseableRandom = new Random();
 
 	@Override
-	public HandshakeState acceptHandshakeAsClient( ClientHandshake request, ServerHandshake response ) {
+	public HandshakeState acceptHandshakeAsClient( ClientHandshake request, ServerHandshake response ) throws IncompleteHandshakeException {
 		return request.getFieldValue( "WebSocket-Origin" ).equals( response.getFieldValue( "Origin" ) ) && basicAccept( response ) ? HandshakeState.MATCHED : HandshakeState.NOT_MATCHED;
 	}
 

@@ -18,6 +18,7 @@ import org.java_websocket.WebSocketImpl;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.drafts.IDraft;
 import org.java_websocket.exceptions.InvalidHandshakeException;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.framing.Framedata.Opcode;
@@ -140,8 +141,9 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * 
 	 * @param text
 	 *            The string which will be transmitted.
+	 * @throws WebsocketNotConnectedException 
 	 */
-	public void send( String text ) throws NotYetConnectedException {
+	public void send( String text ) throws NotYetConnectedException, WebsocketNotConnectedException {
 		engine.send( text );
 	}
 
@@ -150,8 +152,10 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * 
 	 * @param data
 	 *            The byte-Array of data to send to the WebSocket server.
+	 * @throws WebsocketNotConnectedException 
+	 * @throws IllegalArgumentException 
 	 */
-	public void send( byte[] data ) throws NotYetConnectedException {
+	public void send( byte[] data ) throws NotYetConnectedException, IllegalArgumentException, WebsocketNotConnectedException {
 		engine.send( data );
 	}
 
@@ -380,7 +384,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	}
 
 	@Override
-	public void sendFragmentedFrame( Opcode op, ByteBuffer buffer, boolean fin ) {
+	public void sendFragmentedFrame( Opcode op, ByteBuffer buffer, boolean fin ) throws WebsocketNotConnectedException {
 		engine.sendFragmentedFrame( op, buffer, fin );
 	}
 
@@ -430,7 +434,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	}
 
 	@Override
-	public void send( ByteBuffer bytes ) throws IllegalArgumentException , NotYetConnectedException {
+	public void send( ByteBuffer bytes ) throws IllegalArgumentException , NotYetConnectedException, WebsocketNotConnectedException {
 		engine.send( bytes );
 	}
 

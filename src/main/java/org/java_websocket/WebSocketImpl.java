@@ -13,15 +13,14 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft.CloseHandshakeType;
 import org.java_websocket.drafts.Draft.HandshakeState;
 import org.java_websocket.drafts.Draft_10;
 import org.java_websocket.drafts.Draft_17;
 import org.java_websocket.drafts.Draft_75;
 import org.java_websocket.drafts.Draft_76;
-import org.java_websocket.drafts.IDraft;
 import org.java_websocket.drafts.IChannelAccessDraft;
+import org.java_websocket.drafts.IDraft;
 import org.java_websocket.exceptions.IncompleteHandshakeException;
 import org.java_websocket.exceptions.InvalidDataException;
 import org.java_websocket.exceptions.InvalidHandshakeException;
@@ -573,7 +572,7 @@ public class WebSocketImpl implements WebSocket {
 		send( ByteBuffer.wrap( bytes ) );
 	}
 
-	private void send( Collection<Framedata> frames ) {
+	private void send( Collection<Framedata> frames ) throws WebsocketNotConnectedException {
 		if( !isOpen() )
 			throw new WebsocketNotConnectedException();
 		for( Framedata f : frames ) {
@@ -582,7 +581,7 @@ public class WebSocketImpl implements WebSocket {
 	}
 
 	@Override
-	public void sendFragmentedFrame( Opcode op, ByteBuffer buffer, boolean fin ) {
+	public void sendFragmentedFrame( Opcode op, ByteBuffer buffer, boolean fin ) throws WebsocketNotConnectedException {
 		send( draft.continuousFrame( op, buffer, fin ) );
 	}
 

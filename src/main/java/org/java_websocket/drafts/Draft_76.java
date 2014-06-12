@@ -104,7 +104,7 @@ public class Draft_76 extends Draft_75 {
 	}
 
 	@Override
-	public HandshakeState acceptHandshakeAsClient( ClientHandshake request, ServerHandshake response ) {
+	public HandshakeState acceptHandshakeAsClient( ClientHandshake request, ServerHandshake response ) throws IncompleteHandshakeException {
 		if( failed ) {
 			return HandshakeState.NOT_MATCHED;
 		}
@@ -171,7 +171,7 @@ public class Draft_76 extends Draft_75 {
 	}
 
 	@Override
-	public Handshakedata translateHandshake( ByteBuffer buf ) throws InvalidHandshakeException {
+	public Handshakedata translateHandshake( ByteBuffer buf ) throws InvalidHandshakeException, IncompleteHandshakeException {
 
 		HandshakeBuilder bui = translateHandshakeHttp( buf, role );
 		// the first drafts are lacking a protocol number which makes them difficult to distinguish. Sec-WebSocket-Key1 is typical for draft76

@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.NotYetConnectedException;
 
 import org.java_websocket.drafts.IDraft;
+import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.framing.Framedata;
 import org.java_websocket.framing.Framedata.Opcode;
 
@@ -48,18 +49,20 @@ public interface WebSocket {
 	 * 
 	 * @throws IllegalArgumentException
 	 * @throws NotYetConnectedException
+	 * @throws WebsocketNotConnectedException 
 	 */
-	public abstract void send( String text ) throws NotYetConnectedException;
+	public abstract void send( String text ) throws NotYetConnectedException, WebsocketNotConnectedException;
 
 	/**
 	 * Send Binary data (plain bytes) to the other end.
 	 * 
 	 * @throws IllegalArgumentException
 	 * @throws NotYetConnectedException
+	 * @throws WebsocketNotConnectedException 
 	 */
-	public abstract void send( ByteBuffer bytes ) throws IllegalArgumentException , NotYetConnectedException;
+	public abstract void send( ByteBuffer bytes ) throws IllegalArgumentException , NotYetConnectedException, WebsocketNotConnectedException;
 
-	public abstract void send( byte[] bytes ) throws IllegalArgumentException , NotYetConnectedException;
+	public abstract void send( byte[] bytes ) throws IllegalArgumentException , NotYetConnectedException, WebsocketNotConnectedException;
 
 	public abstract void sendFrame( Framedata framedata );
 
@@ -75,8 +78,9 @@ public interface WebSocket {
 	 *            The buffer which contains the payload. It may have no bytes remaining.
 	 * @param fin
 	 *            true means the current frame is the last in the sequence.
+	 * @throws WebsocketNotConnectedException 
 	 **/
-	public abstract void sendFragmentedFrame( Opcode op, ByteBuffer buffer, boolean fin );
+	public abstract void sendFragmentedFrame( Opcode op, ByteBuffer buffer, boolean fin ) throws WebsocketNotConnectedException;
 
 	public abstract boolean hasBufferedData();
 
